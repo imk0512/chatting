@@ -18,7 +18,6 @@ struct AuthDataResultModel {
     self.uid = user.uid
     self.email = user.email
     self.photoUrl = user.photoURL?.absoluteString
-    
   }
 }
 
@@ -32,14 +31,29 @@ final class AuthenticationManager {
     guard let user = Auth.auth().currentUser else {
       throw URLError(.badServerResponse)
     }
-    
     return AuthDataResultModel(user: user)
   }
   
-  
-  
   func signOut() throws {
     try Auth.auth().signOut()
+  }
+}
+
+
+
+
+// MARK: Sign in sso
+extension AuthenticationManager{
+  
+  @discardableResult
+  func signInWithGoogle(tokens:GoogleSignInResultModel) async throws -> AuthDataResultModel{
+    let credential = GoogleAuthProvider.credential(withIDToken: tokens.idToken, accessToken: tokens.accessToken)
+    return try await signIn(credential: credential)
+  }
+  
+  func signIn(credential: AuthCredential) async throws -> AuthDataResultModel{
+    let authDataResult =  try await Auth.auth().signIn(with: credential)
+    return AuthDataResultModel(user: authDataResult.user)
   }
 }
 
@@ -76,21 +90,5 @@ extension AuthenticationManager {
       throw URLError(.badServerResponse)
     }
     try await user.updateEmail(to: email)
-  }
-}
-
-// MARK: Sign in sso
-extension AuthenticationManager{
-
-  @discardableResult
-  func signInWithGoogle(tokens:GoogleSignInResultModel) async throws -> AuthDataResultModel{
-    let credential = GoogleAuthProvider.credential(withIDToken: tokens.idToken, accessToken: tokens.accessToken)
-    return try await signIn(credential: credential)
-  }
-  
-  func signIn(credential: AuthCredential) async throws -> AuthDataResultModel{
-    let authDataResult =  try await Auth.auth().signIn(with: credential)
-  
-    return AuthDataResultModel(user: authDataResult.user)
   }
 }
