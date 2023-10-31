@@ -41,7 +41,6 @@ final class ImageFileManager {
     guard let image = UIImage(data: data) else {
       throw URLError(.badServerResponse)
     }
-    print("image->",image)
     return image
   }
 

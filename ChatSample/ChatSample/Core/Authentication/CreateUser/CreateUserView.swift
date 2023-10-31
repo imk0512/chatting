@@ -12,6 +12,7 @@ struct CreateUserView: View {
   
   @StateObject private var viewModel = CreateUserViewModel()
   @Binding var isNotRegistered: Bool
+  @Binding var isLoading: Bool
   @State private var selectedImage: PhotosPickerItem?
   @State private var uiImage: UIImage?
   
@@ -102,6 +103,7 @@ struct CreateUserView: View {
             let res = try await viewModel.createUser()
             if res {
               isNotRegistered = false
+              isLoading = true
             }
             
           } catch {
@@ -124,6 +126,6 @@ struct CreateUserView: View {
 
 struct CreateUserView_Previews: PreviewProvider {
   static var previews: some View {
-    CreateUserView(isNotRegistered: .constant(false))
+    CreateUserView(isNotRegistered: .constant(false),isLoading:.constant(false))
   }
 }

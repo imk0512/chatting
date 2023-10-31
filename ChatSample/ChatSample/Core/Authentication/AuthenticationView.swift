@@ -9,6 +9,7 @@ struct AuthenticationView: View {
   @StateObject private var viewModel = AuthenticationViewModel()
   @Binding var showSignInView: Bool
   @Binding var isNotRegistered: Bool
+  @Binding var isLoading: Bool
   
   
   var body: some View {
@@ -38,15 +39,13 @@ struct AuthenticationView: View {
               let registeredStatus = try await viewModel.checkExist(userId: authDataResult.uid)
               isNotRegistered = registeredStatus
               showSignInView = false
+              isLoading = true
             } catch {
               print(error)
             }
           }
         }
-        
         .padding()
-        
-        
       }
       .padding()
       .navigationTitle("Sign in ")
@@ -57,7 +56,7 @@ struct AuthenticationView: View {
 struct AuthenticationView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationStack {
-      AuthenticationView(showSignInView: .constant(false), isNotRegistered:.constant(false))
+      AuthenticationView(showSignInView: .constant(false), isNotRegistered:.constant(false),isLoading: .constant(true))
     }
   }
 }

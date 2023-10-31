@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import UIKit
 
 
 struct DBUser: Codable {
@@ -19,6 +20,7 @@ struct DBUser: Codable {
   let photoUrl: String?
   let createdAt: Date?
   let profileImagePath: String?
+  var profileImage: UIImage?
   
   init(auth: AuthDataResultModel) {
     self.userId = auth.uid
@@ -29,7 +31,7 @@ struct DBUser: Codable {
     self.photoUrl = auth.photoUrl ?? ""
     self.createdAt = Date()
     self.profileImagePath = ""
-    
+    self.profileImage = nil
   }
   
   init(auth: AuthDataResultModel,name: String, sex:String, birth: String, profileImagePath: String) {
@@ -41,7 +43,7 @@ struct DBUser: Codable {
     self.photoUrl = auth.photoUrl ?? ""
     self.createdAt = Date()
     self.profileImagePath = profileImagePath
-    
+    self.profileImage = nil
   }
   
   
@@ -66,6 +68,7 @@ struct DBUser: Codable {
     self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
     self.createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
     self.profileImagePath = try container.decodeIfPresent(String.self, forKey: .profileImagePath)
+    self.profileImage = nil
   }
   
   func encode(to encoder: Encoder) throws {
@@ -79,8 +82,6 @@ struct DBUser: Codable {
     try container.encodeIfPresent(self.createdAt, forKey: .createdAt)
     try container.encodeIfPresent(self.profileImagePath, forKey: .profileImagePath)
   }
-  
-  
 }
 
 
@@ -103,6 +104,7 @@ final class UserManager {
   func getUser(userId: String) async throws -> DBUser? {
     do {
       let document = try await userDocument(userId: userId).getDocument()
+      
       if document.exists {
         return try document.data(as: DBUser.self)
       } else {

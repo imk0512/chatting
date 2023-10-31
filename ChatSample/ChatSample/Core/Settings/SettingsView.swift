@@ -12,33 +12,39 @@ import SwiftUI
 
 struct SettingsView: View {
   
-    @StateObject private var viewModel = SettingsViewModel()
-    @Binding var showSignInView: Bool
-
-    var body: some View {
-      List {
-        Button("Logout"){
-          Task {
-            do {
-              try viewModel.signOut()
-              showSignInView = true
-            } catch {
-              print(error)
-            }
+  @StateObject private var viewModel = SettingsViewModel()
+  @Binding var showSignInView: Bool
+  @State private var redirectToSignIn = false
+  
+  var body: some View {
+    List {
+      Button("Logout"){
+        Task {
+          do {
+            try viewModel.signOut()
+            showSignInView = true
+            redirectToSignIn = true
+          } catch {
+            print(error)
           }
         }
-        
-        
-//        emailSection
       }
-      .navigationBarTitle("Settings")
     }
+    .task {
+      
+    }
+    .navigationBarTitle("Settings")
+    .background(
+      NavigationLink("", destination: RootVeiw(), isActive: $redirectToSignIn)
+    )
+    
+  }
 }
 
 struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-      SettingsView(showSignInView:  .constant(false))
-    }
+  static var previews: some View {
+    SettingsView(showSignInView: .constant(false))
+  }
 }
 
 
@@ -80,7 +86,7 @@ extension SettingsView {
       }
       
     } header: {
-        Text("Email functions")
-      }
+      Text("Email functions")
     }
+  }
 }

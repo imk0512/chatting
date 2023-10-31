@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct RootVeiw: View {
-  
+  @StateObject private var viewModel = ProfileViewModel()
   @State private var showSignInVeiw: Bool = false
   @State private var isNotRegistered: Bool = false
   @State private var isLoading: Bool = true
@@ -17,36 +17,33 @@ struct RootVeiw: View {
   var body: some View {
 
     VStack {
-      if !showSignInVeiw && !isNotRegistered && !isLoading{
+      if !showSignInVeiw && !isNotRegistered{
         NavigationStack {
-          ProfileView(showSignInView: $showSignInVeiw)
+          ProfileView(showSignInView: $showSignInVeiw, isLoading:$isLoading)
+        }.fullScreenCover(isPresented: $isLoading) {
+          NavigationStack {
+            SplashScreenView()
+          }
         }
       }
     }
     .task {
-      
+
       let authuser = try? AuthenticationManager.shared.getAuthenticatedUser()
       self.showSignInVeiw = authuser == nil ? true : false
       self.isNotRegistered = authuser == nil ? true : false
-      await Task.sleep(3 * 1_000_000_000)
-      
-      self.isLoading = false
     }
     .fullScreenCover(isPresented: $showSignInVeiw) {
       NavigationStack {
-        AuthenticationView(showSignInView: $showSignInVeiw, isNotRegistered: $isNotRegistered)
+        AuthenticationView(showSignInView: $showSignInVeiw, isNotRegistered: $isNotRegistered, isLoading: $isLoading)
       }
     }
     .fullScreenCover(isPresented: $isNotRegistered) {
       NavigationStack {
-        CreateUserView(isNotRegistered: $isNotRegistered)
+        CreateUserView(isNotRegistered: $isNotRegistered,isLoading: $isLoading)
       }
     }
-    .fullScreenCover(isPresented: $isLoading) {
-      NavigationStack {
-        SplashScreenView()
-      }
-    }
+    
   }
 }
 

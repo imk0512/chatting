@@ -20,7 +20,6 @@ final class AuthenticationViewModel: ObservableObject {
   func checkExist(userId: String) async throws -> Bool{
     do {
       let user = try await UserManager.shared.getUser(userId: userId)
-      print("user->",user)
       if user == nil {
         return true
       } else {
