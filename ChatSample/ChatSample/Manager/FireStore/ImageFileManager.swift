@@ -25,6 +25,10 @@ final class ImageFileManager {
     storage.child("users").child(userId)
   }
   
+  private func massageReference(massageId: String) -> StorageReference {
+    storage.child("massages").child(massageId)
+  }
+  
   func getUrlForImage(path: String) async throws -> URL {
    try await Storage.storage().reference(withPath: path).downloadURL()
   }
@@ -66,5 +70,33 @@ final class ImageFileManager {
     }
     
     return try await saveImage(data: data,userId: userId)
+  }
+  
+  func getMassageImageData(userId:String, path: String) async throws -> Data {
+    
+    try await storage.child(path).data(maxSize: 100 * 1024 * 1024)
+  }
+  
+  func saveMassageImage(data: Data, massageId: String) async throws -> (path: String, name: String){
+ 
+    let meta = StorageMetadata()
+    meta.contentType = "image/jpeg"
+    let path = "\(UUID().uuidString).jpeg"
+    let returnedMetaData  = try await massageReference(massageId: massageId).child(path).putDataAsync(data,metadata: meta)
+    
+    guard let returnedPath = returnedMetaData.path, let returnedName = returnedMetaData.name else {
+      throw URLError(.badServerResponse)
+    }
+    
+    return (returnedPath, returnedName)
+      
+  }
+  
+  func saveMassageImage(image: UIImage, massageId:String) async throws -> (path: String, name: String){
+    guard let data = image.jpegData( compressionQuality: 1) else {
+      throw URLError(.backgroundSessionWasDisconnected)
+    }
+    
+    return try await saveMassageImage(data: data,massageId: massageId)
   }
 }

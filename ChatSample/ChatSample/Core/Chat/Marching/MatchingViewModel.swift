@@ -32,7 +32,6 @@ final class MatchingViewModel: ObservableObject {
     self.counterpartImage = nil
   }
   
-
   func loadCurrentUser() async throws {
     let authUser = try AuthenticationManager.shared.getAuthenticatedUser()
     self.userId = authUser.uid
@@ -112,6 +111,21 @@ final class MatchingViewModel: ObservableObject {
       let image = try? await ImageFileManager.shared.getImage(userId:counterpartId,path: path)
       self.counterpartImage = image
     }
+  }
+  
+  func matchingCancel() async throws {
+    try await MatchingManager.shared.deleteMatching(matchingId: matchingId!)
+  }
+  
+  func createFriend () async throws {
+    
+    guard let matchingId ,let counterpart = counterpartUser else {
+      print("createFriend error")
+      return
+    }
+    let friend = DBFriend(friend: counterpart,matchId: matchingId)
+    try await FriendManager.shared.createNewFriend(userId: userId, friend:friend)
+    
   }
   
 }

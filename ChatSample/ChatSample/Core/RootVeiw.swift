@@ -13,37 +13,36 @@ struct RootVeiw: View {
   @State private var showSignInVeiw: Bool = false
   @State private var isNotRegistered: Bool = false
   @State private var isLoading: Bool = true
+
+  @State private var pageType: String = "Profile"
   
   var body: some View {
-
-    VStack {
-      if !showSignInVeiw && !isNotRegistered{
+    NavigationView {
+      VStack {
+        if !showSignInVeiw && !isNotRegistered {
+          TabbarView(showSignInView: $showSignInVeiw)
+        } else {
+          SplashScreenView()
+        }
+      }
+      .task {
+        let authuser = try? AuthenticationManager.shared.getAuthenticatedUser()
+        self.showSignInVeiw = authuser == nil ? true : false
+        self.isNotRegistered = authuser == nil ? true : false
+        print("self.showSignInVeiw",self.showSignInVeiw)
+        print("self.isNotRegistered",self.isNotRegistered)
+      }
+      .fullScreenCover(isPresented: $showSignInVeiw) {
         NavigationStack {
-          ProfileView(showSignInView: $showSignInVeiw, isLoading:$isLoading)
-        }.fullScreenCover(isPresented: $isLoading) {
-          NavigationStack {
-            SplashScreenView()
-          }
+          AuthenticationView(showSignInView: $showSignInVeiw, isNotRegistered: $isNotRegistered)
+        }
+      }
+      .fullScreenCover(isPresented: $isNotRegistered) {
+        NavigationStack {
+          CreateUserView(isNotRegistered: $isNotRegistered)
         }
       }
     }
-    .task {
-
-      let authuser = try? AuthenticationManager.shared.getAuthenticatedUser()
-      self.showSignInVeiw = authuser == nil ? true : false
-      self.isNotRegistered = authuser == nil ? true : false
-    }
-    .fullScreenCover(isPresented: $showSignInVeiw) {
-      NavigationStack {
-        AuthenticationView(showSignInView: $showSignInVeiw, isNotRegistered: $isNotRegistered, isLoading: $isLoading)
-      }
-    }
-    .fullScreenCover(isPresented: $isNotRegistered) {
-      NavigationStack {
-        CreateUserView(isNotRegistered: $isNotRegistered,isLoading: $isLoading)
-      }
-    }
-    
   }
 }
 

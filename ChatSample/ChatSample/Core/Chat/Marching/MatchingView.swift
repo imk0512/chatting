@@ -9,9 +9,12 @@ import SwiftUI
 
 struct MatchingView: View {
   @StateObject private var viewModel = MatchingViewModel()
+  @State private var isCancel: Bool = false
+
+  @Binding var matchId: String
+  @Binding var friendId: String
+  @Binding var isMatchingSearch: Bool
   
-  @State private var isLoading: Bool = true
-  @State private var isMatching: Bool = false
   //  @State private var matchId: String
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   
@@ -29,7 +32,6 @@ struct MatchingView: View {
               .clipShape(Circle())
               .padding(.vertical, 10)
             
-            // 名前入力エリア
             Text(viewModel.counterpartUser?.name ?? "")
               .frame(width: 250)
               .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
@@ -85,16 +87,28 @@ struct MatchingView: View {
           try? await viewModel.getMatchingUser()
         }
       } else if viewModel.matching?.status == "waiting" {
-        LottieView(name: "Searching", loopMode: .loop).frame(width: 600.0,height: 600.0)
+        WattingView(isCancel: $isCancel)
           .task {
             viewModel.initCounterpartUser()
+          }.onChange(of: isCancel) { isCancel in
+            Task {
+              if isCancel {
+                try? await viewModel.matchingCancel()
+                presentationMode.wrappedValue.dismiss()
+              }
+            }
           }
       } else if viewModel.matching?.status == "chatting" {
         VStack{
           
         }.task {
-          presentationMode.wrappedValue.dismiss()
-          self.isMatching = true
+          try? await viewModel.createFriend()
+          if let matchId = viewModel.matchingId , let counterpartUserId = viewModel.counterpartUser?.userId {
+            self.matchId = matchId
+            self.friendId = counterpartUserId
+          }
+          
+          self.isMatchingSearch = false
         }
         
       }
@@ -109,19 +123,6 @@ struct MatchingView: View {
       }
       try? await viewModel.getMatching(matchingId: viewModel.matchingId  ?? "")
     }
-    .background(
-      NavigationView  {
-        if let matchingId = viewModel.matchingId {
-          NavigationLink("", destination: ChatRoomView(matchId: matchingId), isActive: $isMatching).isDetailLink(false)
-        }
-      }
-    )
   }
   
-}
-
-struct MatchingView_Previews: PreviewProvider {
-  static var previews: some View {
-    MatchingView()
-  }
 }

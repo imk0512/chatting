@@ -8,8 +8,6 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
-import UIKit
-
 
 struct DBUser: Codable {
   let userId: String
@@ -20,7 +18,7 @@ struct DBUser: Codable {
   let photoUrl: String?
   let createdAt: Date?
   let profileImagePath: String?
-  var profileImage: UIImage?
+  let profileImageUrl: String?
   
   init(auth: AuthDataResultModel) {
     self.userId = auth.uid
@@ -31,10 +29,10 @@ struct DBUser: Codable {
     self.photoUrl = auth.photoUrl ?? ""
     self.createdAt = Date()
     self.profileImagePath = ""
-    self.profileImage = nil
+    self.profileImageUrl = ""
   }
   
-  init(auth: AuthDataResultModel,name: String, sex:String, birth: String, profileImagePath: String) {
+  init(auth: AuthDataResultModel,name: String, sex:String, birth: String, profileImagePath: String,profileImageUrl: String) {
     self.userId = auth.uid
     self.email = auth.email ?? ""
     self.name = name
@@ -43,9 +41,8 @@ struct DBUser: Codable {
     self.photoUrl = auth.photoUrl ?? ""
     self.createdAt = Date()
     self.profileImagePath = profileImagePath
-    self.profileImage = nil
+    self.profileImageUrl = profileImageUrl
   }
-  
   
   enum CodingKeys: String, CodingKey {
     case userId = "user_id"
@@ -56,19 +53,20 @@ struct DBUser: Codable {
     case photoUrl = "photo_url"
     case createdAt = "created_at"
     case profileImagePath = "profile_image_path"
+    case profileImageUrl = "profile_image_url"
   }
   
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.userId = try container.decode(String.self, forKey: .userId)
-    self.email = try container.decodeIfPresent(String.self, forKey: .email)
-    self.name = try container.decodeIfPresent(String.self, forKey: .name)
-    self.sex = try container.decodeIfPresent(String.self, forKey: .sex)
-    self.birth = try container.decodeIfPresent(String.self, forKey: .birth)
-    self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
-    self.createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
-    self.profileImagePath = try container.decodeIfPresent(String.self, forKey: .profileImagePath)
-    self.profileImage = nil
+      self.userId = try container.decode(String.self, forKey: .userId)
+      self.email = try container.decodeIfPresent(String.self, forKey: .email)
+      self.name = try container.decodeIfPresent(String.self, forKey: .name)
+      self.sex = try container.decodeIfPresent(String.self, forKey: .sex)
+      self.birth = try container.decodeIfPresent(String.self, forKey: .birth)
+      self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
+      self.createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+      self.profileImagePath = try container.decodeIfPresent(String.self, forKey: .profileImagePath)
+      self.profileImageUrl = try container.decodeIfPresent(String.self, forKey: .profileImageUrl)
   }
   
   func encode(to encoder: Encoder) throws {
@@ -81,7 +79,9 @@ struct DBUser: Codable {
     try container.encodeIfPresent(self.photoUrl, forKey: .photoUrl)
     try container.encodeIfPresent(self.createdAt, forKey: .createdAt)
     try container.encodeIfPresent(self.profileImagePath, forKey: .profileImagePath)
+    try container.encodeIfPresent(self.profileImageUrl, forKey: .profileImageUrl)
   }
+  
 }
 
 
@@ -98,7 +98,7 @@ final class UserManager {
   
   
   func createNewUser(user: DBUser) async throws {
-    try userDocument(userId: user.userId).setData(from: user, merge:false)
+    try userDocument(userId: user.userId).setData(from: user , merge:false)
   }
   
   func getUser(userId: String) async throws -> DBUser? {

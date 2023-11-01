@@ -189,4 +189,8 @@ final class MatchingManager {
     try await matchingDocument(matchingId: matchingId).updateData(data)
   }
   
+  func deleteMatching(matchingId: String) async throws {
+    try await matchingDocument(matchingId: matchingId).delete()
+  }
+  
 }

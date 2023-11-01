@@ -14,7 +14,6 @@ struct SettingsView: View {
   
   @StateObject private var viewModel = SettingsViewModel()
   @Binding var showSignInView: Bool
-  @State private var redirectToSignIn = false
   
   var body: some View {
     List {
@@ -23,7 +22,6 @@ struct SettingsView: View {
           do {
             try viewModel.signOut()
             showSignInView = true
-            redirectToSignIn = true
           } catch {
             print(error)
           }
@@ -34,10 +32,6 @@ struct SettingsView: View {
       
     }
     .navigationBarTitle("Settings")
-    .background(
-      NavigationLink("", destination: RootVeiw(), isActive: $redirectToSignIn)
-    )
-    
   }
 }
 

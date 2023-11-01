@@ -16,7 +16,7 @@ final class CreateUserViewModel: ObservableObject {
   @Published var selectedGender = ""
   @Published var selectedDate = Date()
   @Published var profileImagePath = ""
-  
+  @Published var profileImageUrl = ""
   
   func createUser() async throws -> Bool{
     
@@ -36,7 +36,7 @@ final class CreateUserViewModel: ObservableObject {
     let birth = dateFormatter.string(from: selectedDate)
     
     let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
-    var data = DBUser(auth:authDataResult, name: name, sex: selectedGender, birth: birth,profileImagePath: profileImagePath)
+    var data = DBUser(auth:authDataResult, name: name, sex: selectedGender, birth: birth,profileImagePath: profileImagePath,profileImageUrl: profileImageUrl)
     
     try await UserManager.shared.createNewUser(user: data)
     
@@ -57,7 +57,9 @@ final class CreateUserViewModel: ObservableObject {
      
       guard let data = try await item.loadTransferable(type: Data.self) else { return }
       let (path, name) = try await ImageFileManager.shared.saveImage(data: data,userId: authDataResult.uid)
+      let url = try await ImageFileManager.shared.getUrlForImage(path: path)
       profileImagePath = path
+      profileImageUrl = url.absoluteString
     }
   }
 }
