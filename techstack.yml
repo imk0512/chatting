@@ -1,0 +1,31 @@
+repo_name: imk0512/chatting
+report_id: 76cfd27465674fb243c0ac479590304b
+version: 0.1
+repo_type: Public
+timestamp: '2024-01-12T09:38:55+00:00'
+requested_by: imk0512
+provider: github
+branch: main
+detected_tools_count: 2
+tools:
+- name: Swift
+  description: 'An innovative new programming language for Cocoa and Cocoa Touch. '
+  website_url: https://developer.apple.com/swift/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1009/tuHsaI2U.png
+  detection_source_url: https://github.com/imk0512/chatting
+  detection_source: Repo Metadata
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/imk0512/chatting
+  detection_source: Repo Metadata
